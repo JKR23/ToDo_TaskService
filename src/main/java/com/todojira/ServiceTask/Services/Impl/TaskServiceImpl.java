@@ -4,6 +4,8 @@ import com.todojira.ServiceTask.DTO.PriorityDTO;
 import com.todojira.ServiceTask.DTO.StatusDTO;
 import com.todojira.ServiceTask.DTO.TaskDTO;
 import com.todojira.ServiceTask.Models.Task;
+import com.todojira.ServiceTask.Repositories.PriorityRepository;
+import com.todojira.ServiceTask.Repositories.StatusRepository;
 import com.todojira.ServiceTask.Repositories.TaskRepository;
 import com.todojira.ServiceTask.Services.TaskService;
 import com.todojira.ServiceTask.Validation.ObjectValidator;
@@ -30,7 +32,17 @@ public class TaskServiceImpl implements TaskService {
      * @param title the title of the task to find*/
     @Override
     public List<TaskDTO> findTaskByTitle(String title) {
-        return TaskDTO.transformToDTO(this.taskRepository.findTasksByTitle(title));
+        return TaskDTO.transformToDTO(this.taskRepository.findTasksByTitleContainingIgnoreCase(title));
+    }
+
+    @Override
+    public List<TaskDTO> findTasksByStatus_Id(Long statusId) {
+        return TaskDTO.transformToDTO(this.taskRepository.findTasksByStatus_Id(statusId));
+    }
+
+    @Override
+    public List<TaskDTO> findTasksByPriority_Id(Long priorityId) {
+        return TaskDTO.transformToDTO(this.taskRepository.findTasksByPriority_Id(priorityId));
     }
 
     /**

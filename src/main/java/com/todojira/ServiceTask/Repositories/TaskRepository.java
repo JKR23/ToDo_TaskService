@@ -8,5 +8,10 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    List<Task> findTasksByTitle(String title);
+
+    List<Task> findTasksByTitleContainingIgnoreCase(String title);
+
+    List<Task> findTasksByStatus_Id(Long statusId);
+
+    List<Task> findTasksByPriority_Id(Long priorityId);
 }
