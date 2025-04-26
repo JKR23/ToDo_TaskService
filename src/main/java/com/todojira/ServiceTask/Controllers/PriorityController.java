@@ -1,7 +1,6 @@
 package com.todojira.ServiceTask.Controllers;
 
 import com.todojira.ServiceTask.DTO.PriorityDTO;
-import com.todojira.ServiceTask.DTO.StatusDTO;
 import com.todojira.ServiceTask.Services.PriorityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +45,7 @@ public class PriorityController {
                 .body(priorityService.findPriorityByNameContainingIgnoreCase(name));
     }
 
-    @GetMapping(path = "/addPriority")
+    @PostMapping(path = "/addPriority")
     public ResponseEntity<?> addPriority(@Valid @RequestBody PriorityDTO priorityDTO, BindingResult result){
 
         if (result.hasErrors()){
@@ -65,7 +64,7 @@ public class PriorityController {
                 .body(priorityService.addPriority(priorityDTO));
     }
 
-    @GetMapping(path = "/updatePriority")
+    @PutMapping(path = "/updatePriority")
     public ResponseEntity<?> updatePriority(@Valid @RequestBody PriorityDTO priorityDTO, BindingResult result){
 
         if (result.hasErrors()){
@@ -84,7 +83,7 @@ public class PriorityController {
                 .body(priorityService.updatePriority(priorityDTO));
     }
 
-    @GetMapping(path = "/deletePriority/id/{id}")
+    @DeleteMapping(path = "/deletePriority/id/{id}")
     public ResponseEntity<?> deletePriority(@PathVariable Long id, BindingResult result){
 
         if (result.hasErrors()){

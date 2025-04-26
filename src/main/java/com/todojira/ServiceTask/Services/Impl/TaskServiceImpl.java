@@ -22,6 +22,8 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final ObjectValidator objectValidator;
+    private final PriorityRepository priorityRepository;
+    private final StatusRepository statusRepository;
 
     @Override
     public List<TaskDTO> findAll() {
@@ -51,7 +53,15 @@ public class TaskServiceImpl implements TaskService {
     public String addTask(TaskDTO taskDTO) {
         try{
             this.objectValidator.validate(taskDTO);
+
+            Task task = TaskDTO.transformToEntity(taskDTO);
+
+            if (task.getStatus() == null) task.setStatus(this.statusRepository.findStatusByName("TODO"));
+
+            if (task.getPriority() == null) task.setPriority(this.priorityRepository.findPriorityByName("Medium"));
+
             this.taskRepository.save(TaskDTO.transformToEntity(taskDTO));
+
             return "Task "+ taskDTO.getTitle()+ " added successfully";
         }catch(Exception e){
             throw new RuntimeException(e.getMessage());
@@ -59,11 +69,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
-     * @param taskDTOs the tasks fetch from json file*/
+     * @param tasks the tasks fetch from json file*/
     @Override
-    public String addTaskFromJsonFile(List<TaskDTO> taskDTOs) {
-        this.objectValidator.validate(taskDTOs);
-        this.taskRepository.saveAll(TaskDTO.transformToEntity(taskDTOs));
+    public String addTaskFromJsonFile(List<Task> tasks) {
+        this.objectValidator.validate(tasks);
+        this.taskRepository.saveAll(tasks);
         return "List task added successfully";
     }
 
