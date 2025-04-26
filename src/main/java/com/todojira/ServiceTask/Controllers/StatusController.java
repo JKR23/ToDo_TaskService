@@ -48,7 +48,7 @@ public class StatusController {
                 .body(statusService.findStatusByNameContainingIgnoreCase(name));
     }
 
-    @GetMapping(path = "/addStatus")
+    @PostMapping(path = "/addStatus")
     public ResponseEntity<?> addStatus(@Valid @RequestBody StatusDTO statusDTO, BindingResult result){
 
         if (result.hasErrors()){
@@ -67,7 +67,7 @@ public class StatusController {
                 .body(statusService.addStatus(statusDTO));
     }
 
-    @GetMapping(path = "/updateStatus")
+    @PutMapping(path = "/updateStatus")
     public ResponseEntity<?> updateStatus(@Valid @RequestBody StatusDTO statusDTO, BindingResult result){
 
         if (result.hasErrors()){
@@ -86,7 +86,7 @@ public class StatusController {
                 .body(statusService.updateStatus(statusDTO));
     }
 
-    @GetMapping(path = "/deleteStatus/id/{id}")
+    @DeleteMapping(path = "/deleteStatus/id/{id}")
     public ResponseEntity<?> deleteStatus(@PathVariable Long id, BindingResult result){
 
         if (result.hasErrors()){

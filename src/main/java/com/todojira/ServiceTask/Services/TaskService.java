@@ -11,7 +11,7 @@ public interface TaskService {
     List<TaskDTO> findTasksByStatus_Id(Long statusId);
     List<TaskDTO> findTasksByPriority_Id(Long priorityId);
     String addTask(TaskDTO taskDTO);
-    String addTaskFromJsonFile(List<TaskDTO> taskDTOs);
+    String addTaskFromJsonFile(List<Task> tasks);
     String updateTask(TaskDTO taskDTO);
     String deleteTask(Long id);
 }
