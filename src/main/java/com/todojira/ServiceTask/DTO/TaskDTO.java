@@ -1,6 +1,12 @@
 package com.todojira.ServiceTask.DTO;
 
+import com.todojira.ServiceTask.Models.Priority;
+import com.todojira.ServiceTask.Models.Status;
 import com.todojira.ServiceTask.Models.Task;
+import com.todojira.ServiceTask.Repositories.PriorityRepository;
+import com.todojira.ServiceTask.Repositories.StatusRepository;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -8,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,7 +26,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Getter
 public class TaskDTO implements Serializable {
-
     private Long id;
 
     @NotNull(message = "title cannot be null")
@@ -29,43 +35,12 @@ public class TaskDTO implements Serializable {
 
     private String description;
 
-    private PriorityDTO priority;
+    private Long priorityId;
 
-    private StatusDTO status;
+    private Long statusId;
 
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
 
-    public static TaskDTO transformToDTO(Task task) {
-        return TaskDTO.builder()
-                .id(task.getId())
-                .title(task.getTitle())
-                .description(task.getDescription())
-                .priority(PriorityDTO.transformToDTO(task.getPriority()))
-                .status(StatusDTO.transformToDTO(task.getStatus()))
-                .startDate(task.getStartDate())
-                .endDate(task.getEndDate())
-                .build();
-    }
-
-    public static Task transformToEntity(TaskDTO dto) {
-        return Task.builder()
-                .id(dto.getId())
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .priority(PriorityDTO.transformToEntity(dto.getPriority()))
-                .status(StatusDTO.transformToEntity(dto.getStatus()))
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .build();
-    }
-
-    public static List<TaskDTO> transformToDTO(List<Task> tasks) {
-        return tasks.stream().map(TaskDTO::transformToDTO).collect(Collectors.toList());
-    }
-
-    public static List<Task> transformToEntity(List<TaskDTO> dtoList) {
-        return dtoList.stream().map(TaskDTO::transformToEntity).collect(Collectors.toList());
-    }
 }

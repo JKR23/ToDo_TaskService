@@ -13,32 +13,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController("api/priority/")
+@RestController
+@RequestMapping("api/priority")
 @RequiredArgsConstructor
 public class PriorityController {
 
     private final PriorityService priorityService;
 
-    @GetMapping(path = "/getAll")
-    public ResponseEntity<?> getAllStatus(){
+    @GetMapping(path = "/getAllPriorities")
+    public ResponseEntity<?> getAllPriorities(){
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
                 .body(priorityService.getAllPriority());
     }
 
-    @GetMapping(path = "/getByName")
-    public ResponseEntity<?> getByName(@RequestParam String name, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    @GetMapping(path = "/getPriorityByName")
+    public ResponseEntity<?> getPriorityByName(@RequestParam String name){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
@@ -84,18 +74,7 @@ public class PriorityController {
     }
 
     @DeleteMapping(path = "/deletePriority/id/{id}")
-    public ResponseEntity<?> deletePriority(@PathVariable Long id, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    public ResponseEntity<?> deletePriority(@PathVariable Long id){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))

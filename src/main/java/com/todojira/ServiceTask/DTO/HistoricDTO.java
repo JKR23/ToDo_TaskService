@@ -10,8 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Builder
 @AllArgsConstructor
@@ -27,28 +25,4 @@ public class HistoricDTO implements Serializable {
     private String actionType;  // ex: TASK_CREATED, STATUS_CHANGED, PRIORITY_CHANGED
 
     private TaskDTO taskDTO;
-
-    public static HistoricDTO transformToDTO(Historic historic) {
-        return HistoricDTO.builder()
-                .id(historic.getId())
-                .actionType(historic.getActionType())
-                .taskDTO(TaskDTO.transformToDTO(historic.getTask()))
-                .build();
-    }
-
-    public static Historic transformToEntity(HistoricDTO historicDTO) {
-        return Historic.builder()
-                .id(historicDTO.getId())
-                .actionType(historicDTO.getActionType())
-                .task(TaskDTO.transformToEntity(historicDTO.getTaskDTO()))
-                .build();
-    }
-
-    public static List<HistoricDTO> transformToDTO(List<Historic> historicList) {
-        return historicList.stream().map(HistoricDTO::transformToDTO).collect(Collectors.toList());
-    }
-
-    public static List<Historic> transformToEntity(List<HistoricDTO> historicDTOList) {
-        return historicDTOList.stream().map(HistoricDTO::transformToEntity).collect(Collectors.toList());
-    }
 }

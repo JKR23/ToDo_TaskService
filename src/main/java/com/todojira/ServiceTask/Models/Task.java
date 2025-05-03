@@ -25,7 +25,7 @@ public class Task implements Serializable {
 
     @NotNull(message = "title cannot be null")
     @NotBlank(message = "title cannot be blank")
-    @Size(min = 3, max = 15, message = "title must have min 3, max 15")
+    @Size(min = 3, max = 100, message = "title must have min 3, max 100")
     private String title;
 
     private String description;

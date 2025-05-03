@@ -15,33 +15,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController("api/status")
+@RestController
+@RequestMapping("api/status")
 @RequiredArgsConstructor
 public class StatusController {
 
     private final StatusService statusService;
     private final Logger logger = LoggerFactory.getLogger(StatusController.class);
 
-    @GetMapping(path = "/getAll")
+    @GetMapping(path = "/getAllStatus")
     public ResponseEntity<?> getAllStatus(){
+        logger.info("getAllStatus");
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
                 .body(statusService.getAllStatus());
     }
 
-    @GetMapping(path = "/getByName")
-    public ResponseEntity<?> getByName(@RequestParam String name, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    @GetMapping(path = "/getStatusByName")
+    public ResponseEntity<?> getByName(@RequestParam String name){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
@@ -87,22 +78,19 @@ public class StatusController {
     }
 
     @DeleteMapping(path = "/deleteStatus/id/{id}")
-    public ResponseEntity<?> deleteStatus(@PathVariable Long id, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    public ResponseEntity<?> deleteStatus(@PathVariable Long id){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
                 .body(statusService.deleteStatus(id));
+    }
+
+    @DeleteMapping(path = "/eraseStatus")
+    public ResponseEntity<?> eraseStatus(){
+
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(200))
+                .body(statusService.eraseStatus());
     }
 
 }

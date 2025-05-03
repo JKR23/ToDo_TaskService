@@ -10,4 +10,5 @@ public interface StatusService {
     String addStatus(StatusDTO statusDTO);
     String updateStatus(StatusDTO statusDTO);
     String deleteStatus(Long id);
+    String eraseStatus();
 }
