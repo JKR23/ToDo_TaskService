@@ -1,7 +1,5 @@
 package com.todojira.ServiceTask.Mapper;
 
-import com.todojira.ServiceTask.DTO.HistoricDTO;
-import com.todojira.ServiceTask.Models.Historic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

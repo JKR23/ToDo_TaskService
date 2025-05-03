@@ -47,4 +47,5 @@ public class PriorityDTO implements Serializable {
     public static List<Priority> transformToEntity(List<PriorityDTO> prioritiesDto) {
         return prioritiesDto.stream().map(PriorityDTO::transformToEntity).collect(Collectors.toList());
     }
+
 }
