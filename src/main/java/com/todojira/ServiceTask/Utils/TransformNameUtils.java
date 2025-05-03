@@ -1,8 +1,8 @@
-package com.todojira.ServiceTask;
+package com.todojira.ServiceTask.Utils;
 
 public class TransformNameUtils {
 
-    public static String transformName(String name) {
+    public static String transformToUpperCase(String name) {
 
         //delete possible whiteBlank in the beginning or the end replace the whiteBlank by _
         // eg : "  in progress  " return : "in progress"

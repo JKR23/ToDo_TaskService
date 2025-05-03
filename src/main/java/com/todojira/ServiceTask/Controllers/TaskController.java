@@ -2,12 +2,15 @@ package com.todojira.ServiceTask.Controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.todojira.ServiceTask.DTO.TaskDTO;
-import com.todojira.ServiceTask.Models.Task;
+import com.todojira.ServiceTask.Mapper.TaskMapper;
 import com.todojira.ServiceTask.Services.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -18,11 +21,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController("api/task")
+@RestController
+@RequestMapping("api/task")
 @RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
+    private final TaskMapper taskMapper;
 
     @GetMapping(path = "/getAll")
     public ResponseEntity<?> getAll(){
@@ -32,18 +37,7 @@ public class TaskController {
     }
 
     @GetMapping(path = "/getByName")
-    public ResponseEntity<?> getByName(@RequestParam String name, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    public ResponseEntity<?> getByName(@RequestParam String name){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
@@ -51,18 +45,7 @@ public class TaskController {
     }
 
     @GetMapping(path = "/getByStatus/id/{statusId}")
-    public ResponseEntity<?> getByName(@PathVariable Long statusId, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    public ResponseEntity<?> getByStatus(@PathVariable Long statusId){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
@@ -70,18 +53,7 @@ public class TaskController {
     }
 
     @GetMapping(path = "/getByPriority/id/{priorityId}")
-    public ResponseEntity<?> getByPriority(@PathVariable Long priorityId, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    public ResponseEntity<?> getByPriority(@PathVariable Long priorityId){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
@@ -109,13 +81,27 @@ public class TaskController {
 
     @PostMapping(path = "/uploadTasks")
     public ResponseEntity<?> uploadTasks(@RequestParam("file") MultipartFile file){
+
+        if (file.getSize() > 5_000_000) { // 5 MB
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("File too large. Max allowed size is 1MB.");
+        }
+
         try{
             /// create reader file
-            ObjectMapper mapper = new ObjectMapper();
-            List<Task> taskList = mapper.readValue(file.getInputStream(), new TypeReference<>() {
+            ObjectMapper mapperReaderFile = new ObjectMapper();
+
+            /// for helping in deserialization LocalDateTime
+            mapperReaderFile.registerModule(new JavaTimeModule());
+            mapperReaderFile.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            /// fetch tasks from file
+            List<TaskDTO> taskDTOList = mapperReaderFile.readValue(file.getInputStream(), new TypeReference<>() {
             });
 
-            String result = this.taskService.addTaskFromJsonFile(taskList);
+            /// recover the result of that operation
+            String result = this.taskService.addTaskFromJsonFile(this.taskMapper.transformToEntity(taskDTOList));
 
             return ResponseEntity
                     .status(HttpStatusCode.valueOf(200))
@@ -123,7 +109,7 @@ public class TaskController {
         }catch (IOException e){
             throw new RuntimeException("Error while reading tasks");
         }catch (Exception e){
-            throw new RuntimeException("Error while uploading tasks");
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -147,18 +133,7 @@ public class TaskController {
     }
 
     @DeleteMapping(path = "/deleteTask/id/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id, BindingResult result){
-
-        if (result.hasErrors()){
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .collect(Collectors.toList());
-
-            return ResponseEntity
-                    .status(HttpStatusCode.valueOf(404))
-                    .body(errors);
-        }
+    public ResponseEntity<?> deleteTask(@PathVariable Long id){
 
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))

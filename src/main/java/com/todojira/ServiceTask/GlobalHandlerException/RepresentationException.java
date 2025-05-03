@@ -1,4 +1,4 @@
-package com.todojira.ServiceTask.Exceptions.GlobalHandlerException;
+package com.todojira.ServiceTask.GlobalHandlerException;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,5 +11,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RepresentationException {
     private String error;
-    private String source;
 }

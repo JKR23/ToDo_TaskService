@@ -4,8 +4,8 @@ import com.todojira.ServiceTask.DTO.StatusDTO;
 import com.todojira.ServiceTask.Models.Status;
 import com.todojira.ServiceTask.Repositories.StatusRepository;
 import com.todojira.ServiceTask.Services.StatusService;
+import com.todojira.ServiceTask.Utils.TransformNameUtils;
 import com.todojira.ServiceTask.Validation.ObjectValidator;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,22 +33,16 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     public String addStatus(StatusDTO statusDTO) {
-        try {
 
-            this.objectValidator.validate(statusDTO);
+        this.objectValidator.validate(statusDTO);
 
-            if (this.statusRepository.findStatusByName(statusDTO.getName()) != null) {
-                throw new EntityExistsException("Status already exists");
-            }
+        Status status = StatusDTO.transformToEntity(statusDTO);
 
-            Status status = StatusDTO.transformToEntity(statusDTO);
+        status.setName(TransformNameUtils.transformToUpperCase((statusDTO.getName())));
 
-            this.statusRepository.save(status);
+        this.statusRepository.save(status);
 
-            return statusDTO.getName()+" added successfully";
-        }catch (EntityExistsException e) {
-            throw new EntityExistsException(e.getMessage());
-        }
+        return "Status " + status.getName() + " added successfully";
 
     }
 
@@ -63,20 +57,20 @@ public class StatusServiceImpl implements StatusService {
                 throw new EntityNotFoundException("Status not found");
             }
 
-            statusOptional.get().setName(statusDTO.getName());
+            statusOptional.get().setName(TransformNameUtils.transformToUpperCase(statusDTO.getName()));
             this.statusRepository.save(statusOptional.get());
 
-            return statusDTO.getName()+" updated successfully";
+            return  "Status " + statusOptional.get().getName()+" updated successfully";
 
-        }catch (EntityExistsException e) {
-            throw new EntityExistsException(e.getMessage());
+        }catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException(e.getMessage());
         }
     }
 
     @Override
     public String deleteStatus(Long id) {
         try {
-            this.statusRepository.deleteById(id);
+            this.objectValidator.validate(id);
 
             Optional<Status> statusOptional = this.statusRepository.findById(id);
 
@@ -86,9 +80,17 @@ public class StatusServiceImpl implements StatusService {
 
             this.statusRepository.delete(statusOptional.get());
 
-            return statusOptional.get().getName()+" deleted successfully";
+            return "Status "+ statusOptional.get().getName()+" deleted successfully";
+
         }catch (EntityNotFoundException e) {
             throw new EntityNotFoundException(e.getMessage());
         }
     }
+
+    @Override
+    public String eraseStatus() {
+        this.statusRepository.deleteAll();
+        return "Status erased successfully";
+    }
+
 }

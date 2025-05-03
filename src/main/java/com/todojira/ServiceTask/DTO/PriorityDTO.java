@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Getter
 public class PriorityDTO implements Serializable {
+
     private Long id;
 
     @NotNull(message = "name cannot be null")

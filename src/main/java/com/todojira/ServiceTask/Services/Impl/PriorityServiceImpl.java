@@ -4,6 +4,7 @@ import com.todojira.ServiceTask.DTO.PriorityDTO;
 import com.todojira.ServiceTask.Models.Priority;
 import com.todojira.ServiceTask.Repositories.PriorityRepository;
 import com.todojira.ServiceTask.Services.PriorityService;
+import com.todojira.ServiceTask.Utils.TransformNameUtils;
 import com.todojira.ServiceTask.Validation.ObjectValidator;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,9 +44,13 @@ public class PriorityServiceImpl implements PriorityService {
                 throw new EntityExistsException("The priority already exists");
             }
 
-            this.priorityRepository.save(PriorityDTO.transformToEntity(priorityDTO));
+            Priority priority = PriorityDTO.transformToEntity(priorityDTO);
 
-            return priorityDTO.getName()+" added successfully";
+            priority.setName(TransformNameUtils.transformToUpperCase(priorityDTO.getName()));
+
+            this.priorityRepository.save(priority);
+
+            return "Priority "+priority.getName()+" added successfully";
 
         }catch (EntityExistsException e) {
             throw new EntityExistsException(e.getMessage());
@@ -57,20 +62,20 @@ public class PriorityServiceImpl implements PriorityService {
         try {
             this.objectValidator.validate(priorityDTO);
 
-            Optional<Priority> priorityOptional = Optional
-                    .ofNullable(this.priorityRepository.findPriorityByName(priorityDTO.getName()));
+            Optional<Priority> priorityOptional = this.priorityRepository.findById(priorityDTO.getId());
 
             if (priorityOptional.isEmpty()) {
                 throw new EntityNotFoundException("The priority does not exist with id " + priorityDTO.getId());
             }
 
-            priorityOptional.get().setName(priorityDTO.getName());
+            priorityOptional.get().setName(TransformNameUtils.transformToUpperCase(priorityDTO.getName()));
 
             this.priorityRepository.save(priorityOptional.get());
 
-            return priorityDTO.getName()+" updated successfully";
-        }catch (EntityExistsException e) {
-            throw new EntityExistsException(e.getMessage());
+            return "Priority "+priorityOptional.get().getName()+" updated successfully";
+
+        }catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException(e.getMessage());
         }
     }
 
@@ -87,7 +92,7 @@ public class PriorityServiceImpl implements PriorityService {
 
             this.priorityRepository.delete(priorityOptional.get());
 
-            return priorityOptional.get().getName()+" deleted successfully";
+            return "Priority "+priorityOptional.get().getName()+" deleted successfully";
 
         }catch (EntityExistsException e) {
             throw new EntityExistsException(e.getMessage());
