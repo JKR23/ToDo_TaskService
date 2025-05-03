@@ -14,4 +14,5 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findTasksByStatus_Id(Long statusId);
 
     List<Task> findTasksByPriority_Id(Long priorityId);
+
 }

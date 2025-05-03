@@ -8,8 +8,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor
@@ -41,9 +39,6 @@ public class Task implements Serializable {
     private LocalDateTime startDate;
 
     private LocalDateTime endDate;
-
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Historic> historicList = new ArrayList<>();
 
     ///private Long createdBy;
 
