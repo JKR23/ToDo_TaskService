@@ -1,5 +1,6 @@
 package com.todojira.ServiceTask.Services.Impl;
 
+import com.todojira.ServiceTask.Configuration.Utils.SecurityUtils;
 import com.todojira.ServiceTask.DTO.TaskDTO;
 import com.todojira.ServiceTask.Mapper.TaskMapper;
 import com.todojira.ServiceTask.Models.Task;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskDTO> findAll() {
         return taskMapper.transformToDTO(this.taskRepository.findAll());
+    }
+
+    @Override
+    public List<TaskDTO> findAllByUserId() {
+        Long createdBy = SecurityUtils.getCurrentUserId();
+        return taskMapper.transformToDTO(taskRepository.findTasksByCreatedBy(createdBy));
     }
 
     /**
@@ -56,6 +62,12 @@ public class TaskServiceImpl implements TaskService {
     public String addTask(TaskDTO taskDTO) {
         try{
             this.objectValidator.validate(taskDTO);
+
+            Long idUser = SecurityUtils.getCurrentUserId();
+
+            this.objectValidator.validate(idUser);
+
+            taskDTO.setIdUser(idUser);
 
             Task task = taskMapper.transformToEntity(taskDTO);
 
@@ -98,11 +110,13 @@ public class TaskServiceImpl implements TaskService {
 
             this.objectValidator.validate(taskDTO);
 
+            Long createdBy = SecurityUtils.getCurrentUserId();
+
             /// if task isValid we fetch it
-            Optional<Task> task = taskRepository.findById(taskDTO.getId());
+            Optional<Task> task = taskRepository.findTaskByIdAndCreatedBy(taskDTO.getId(),createdBy);
 
             if (task.isEmpty()){
-                throw new EntityNotFoundException("Task with id " + taskDTO.getId() + " not found");
+                throw new EntityNotFoundException("Task not found or user not connected");
             }
 
             /// updating task
@@ -140,10 +154,13 @@ public class TaskServiceImpl implements TaskService {
         try {
             this.objectValidator.validate(id);
 
-            Optional<Task> task = this.taskRepository.findById(id);
+            Long createdBy = SecurityUtils.getCurrentUserId();
+
+            /// if task isValid we fetch it
+            Optional<Task> task = taskRepository.findTaskByIdAndCreatedBy(id,createdBy);
 
             if (task.isEmpty()){
-                throw new EntityNotFoundException("Task with id " + id + " not found");
+                throw new EntityNotFoundException("Task not found or user not connected");
             }
 
             this.taskRepository.delete(task.get());
@@ -152,6 +169,46 @@ public class TaskServiceImpl implements TaskService {
         }catch (EntityNotFoundException e){
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    public String eraseAllTasks() {
+        List<Task> tasks = this.taskRepository.findTasksByCreatedBy(SecurityUtils.getCurrentUserId());
+        taskRepository.deleteAll(tasks);
+        return "All tasks deleted successfully";
+    }
+
+    @Override
+    public List<Task> findTasksByPriorityIdAndCreatedBy(Long priorityId) {
+        this.objectValidator.validate(priorityId);
+
+        Long createdBy = SecurityUtils.getCurrentUserId();
+
+        this.objectValidator.validate(createdBy);
+
+        return this.taskRepository.findTasksByPriority_IdAndCreatedBy(priorityId,createdBy);
+    }
+
+    @Override
+    public List<Task> findTasksByStatusIdAndCreatedBy(Long statusId) {
+        this.objectValidator.validate(statusId);
+
+        Long createdBy = SecurityUtils.getCurrentUserId();
+
+        this.objectValidator.validate(createdBy);
+
+        return this.taskRepository.findTaskByStatus_IdAndCreatedBy(statusId,createdBy);
+    }
+
+    @Override
+    public List<Task> findTasksByTitleContainingIgnoreCaseAndCreatedBy(String title) {
+        this.objectValidator.validate(title);
+
+        Long createdBy = SecurityUtils.getCurrentUserId();
+
+        this.objectValidator.validate(createdBy);
+
+        return this.taskRepository.findTasksByTitleContainingIgnoreCaseAndCreatedBy(title,createdBy);
     }
 
     private Task treatPriorityAndStatusTask(Task task){

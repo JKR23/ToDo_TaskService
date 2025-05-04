@@ -40,7 +40,7 @@ public class Task implements Serializable {
 
     private LocalDateTime endDate;
 
-    ///private Long createdBy;
+    private Long createdBy;
 
     ///private Long assignee; //api-user url
 

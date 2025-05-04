@@ -13,6 +13,7 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ public class TaskController {
     private final TaskService taskService;
     private final TaskMapper taskMapper;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(path = "/getAll")
     public ResponseEntity<?> getAll(){
         return ResponseEntity
@@ -36,6 +38,14 @@ public class TaskController {
                 .body(taskService.findAll());
     }
 
+    @GetMapping(path = "/getAllByUserConnected")
+    public ResponseEntity<?> getAllByUserConnected(){
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(200))
+                .body(taskService.findAllByUserId());
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(path = "/getByName")
     public ResponseEntity<?> getByName(@RequestParam String name){
 
@@ -44,6 +54,7 @@ public class TaskController {
                 .body(taskService.findTaskByTitle(name));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(path = "/getByStatus/id/{statusId}")
     public ResponseEntity<?> getByStatus(@PathVariable Long statusId){
 
@@ -52,6 +63,7 @@ public class TaskController {
                 .body(taskService.findTasksByStatus_Id(statusId));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(path = "/getByPriority/id/{priorityId}")
     public ResponseEntity<?> getByPriority(@PathVariable Long priorityId){
 
@@ -138,5 +150,37 @@ public class TaskController {
         return ResponseEntity
                 .status(HttpStatusCode.valueOf(200))
                 .body(taskService.deleteTask(id));
+    }
+
+    @GetMapping(path = "/current-user/getTaskByName")
+    public ResponseEntity<?> findTasksByTitleContainingIgnoreCaseAndCreatedBy(@RequestParam String name){
+
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(200))
+                .body(taskService.findTasksByTitleContainingIgnoreCaseAndCreatedBy(name));
+    }
+
+    @GetMapping(path = "/current-user/getTaskByStatus/id/{statusId}")
+    public ResponseEntity<?> findTaskByStatus_IdAndCreatedBy(@PathVariable Long statusId){
+
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(200))
+                .body(taskService.findTasksByStatusIdAndCreatedBy(statusId));
+    }
+
+    @GetMapping(path = "/current-user/getTaskByPriority/id/{priorityId}")
+    public ResponseEntity<?> findTasksByPriority_IdAndCreatedBy(@PathVariable Long priorityId){
+
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(200))
+                .body(taskService.findTasksByPriorityIdAndCreatedBy(priorityId));
+    }
+
+    @DeleteMapping(path = "/eraseTasks")
+    public ResponseEntity<?> eraseTasks(){
+
+        return ResponseEntity
+                .status(HttpStatusCode.valueOf(200))
+                .body(taskService.eraseAllTasks());
     }
 }
