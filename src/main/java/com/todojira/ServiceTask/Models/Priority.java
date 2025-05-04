@@ -1,5 +1,6 @@
 package com.todojira.ServiceTask.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,5 +28,6 @@ public class Priority implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "priority")
+    @JsonIgnore //for cut off the infinite recursive
     private List<Task> task;
 }

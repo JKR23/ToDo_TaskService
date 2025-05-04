@@ -36,6 +36,7 @@ public class TaskMapper {
                 .statusId(task.getStatus() != null ? task.getStatus().getId() : null)
                 .startDate(task.getStartDate())
                 .endDate(task.getEndDate())
+                .idUser(task.getCreatedBy())
                 .build();
     }
 
@@ -58,6 +59,7 @@ public class TaskMapper {
                 .status(status)
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
+                .createdBy(dto.getIdUser())
                 .build();
 
     }
